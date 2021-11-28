@@ -11,6 +11,6 @@ Students are expected to:
 
 Student Info
 =======================
-
-* Name: ```YourNameHere```
+Name: Dinh Anh Duc
+ID: M20.ICT.001
 
