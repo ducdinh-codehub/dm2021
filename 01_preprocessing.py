@@ -24,10 +24,10 @@ paragraph = paragraph.strip() # Trim remove unecessary space at the begin and th
 not_duplicate_paragraph = ' '.join(unique_list(paragraph.split())) # Removing all the duplicate word to get the keyword
 re.sub("\s\s+", " ", paragraph) # Removing all unecessary space in the paragraph
 
+# Count occurence
 keyWord_stream = not_duplicate_paragraph.split(" ")
 word_list = []
 for keyWord in keyWord_stream:
-    #print(keyWord)
     count_word = paragraph.count(keyWord);
     word_dict = {keyWord:count_word}
     word_list.append(word_dict) 
