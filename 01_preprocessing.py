@@ -1,5 +1,6 @@
 import json
 import re
+from collections import Counter
 def unique_list(l):
     ulist = []
     [ulist.append(x) for x in l if x not in ulist]
@@ -23,13 +24,29 @@ paragraph = paragraph.lower() # Lowercase
 paragraph = paragraph.strip() # Trim remove unecessary space at the begin and the final
 not_duplicate_paragraph = ' '.join(unique_list(paragraph.split())) # Removing all the duplicate word to get the keyword
 re.sub("\s\s+", " ", paragraph) # Removing all unecessary space in the paragraph
-
-# Count occurence
+'''
+Count occurence
+Remove all the meaning less words
+'''
 keyWord_stream = not_duplicate_paragraph.split(" ")
 word_list = []
+no_meaning_word = [ 'a',
+                    'an',
+                    'the',
+                    'of',
+                    'with',
+                    'and',
+                    'in',
+                    'on',
+                    'at',
+                    'from',
+                    'then']
 for keyWord in keyWord_stream:
-    count_word = paragraph.count(keyWord);
-    word_dict = {keyWord:count_word}
-    word_list.append(word_dict) 
+    if(keyWord not in no_meaning_word):
+        count_word = paragraph.count(keyWord);
+        word_dict = {keyWord:count_word}
+        word_list.append(word_dict) 
 
-print(word_list)
+# Remove all the common word
+""" most_occur = 
+print(word_list) """
