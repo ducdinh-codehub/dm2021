@@ -1,95 +1,199 @@
 import json
 import re
-from collections import Counter
 import math
-def unique_list(l):
+from operator import itemgetter
+def unique_list(paragraph):
     ulist = []
-    [ulist.append(x) for x in l if x not in ulist]
+    [ulist.append(x) for x in paragraph if x not in ulist]
     return ulist
-def process(paragraph):
-    paragraph = "".join(word for word in paragraph if word not in ("?", ".", ";", ":", "!",",","(",")")) # Removing all the punctuation
-    paragraph = paragraph.lower() # Lowercase
-    paragraph = paragraph.strip() # Trim remove unecessary space at the begin and the final 
-    paragraph = "".join(filter(lambda x: not x.isdigit(), paragraph))
-    re.sub("\s\s+", " ", paragraph) # Removing all unecessary space in the paragraph
-    return paragraph
 
-    # Removing all the duplicate word to get the keyword
+def process(paragraphs):
+    i = 0
+    len_paragraphs_array = len(paragraphs)
+    while(i < len_paragraphs_array):
+        if (i >= len_paragraphs_array):
+            break
+        paragraphs[i] = "".join(word for word in paragraphs[i] if word not in ("?", ".", ";", ":", "!",",","(",")","\'","\"","\n","\\","/","+","-","*")) # Removing all the punctuation
+        paragraphs[i] = paragraphs[i].lower() # Lowercase
+        paragraphs[i] = paragraphs[i].strip() # Trim remove unecessary space at the begin and the final 
+        paragraphs[i] = re.sub(r'\d+', '',paragraphs[i])
+        paragraphs[i] = re.sub(r"\s\s+", ' ', paragraphs[i]) # Removing all unecessary space in the paragraph
+        i+=1
+    return paragraphs
 
-documents = ["Apparently Prides Osteria had rough summer evidenced by the almost empty dining room at 6:30 on a Friday night. However new blood in the kitchen seems to have revitalized the food from other customers recent visits. Waitstaff was warm but unobtrusive. By 8 pm or so when we left the bar was full and the dining room was much more lively than it had been. Perhaps Beverly residents prefer a later seating. After reading the mixed reviews of late I was a little tentative over our choice but luckily there was nothing to worry about in the food department. We started with the fried dough, burrata and prosciutto which were all lovely. Then although they don't offer half portions of pasta we each ordered the entree size and split them. We chose the tagliatelle bolognese and a four cheese filled pasta in a creamy sauce with bacon, asparagus and grana frita. Both were very good. We split a secondi which was the special Berkshire pork secreto, which was described as a pork skirt steak with garlic potato purée and romanesco broccoli (incorrectly described as a romanesco sauce). Some tables received bread before the meal but for some reason we did not. Management also seems capable for when the tenants in the apartment above began playing basketball she intervened and also comped the tables a dessert. We ordered the apple dumpling with gelato and it was also quite tasty. Portions are not huge which I particularly like because I prefer to order courses. If you are someone who orders just a meal you may leave hungry depending on you appetite. Dining room was mostly younger crowd while the bar was definitely the over 40 set. Would recommend that the naysayers return to see the improvement although I personally don't know the former glory to be able to compare. Easy access to downtown Salem without the crowds on this month of October.",
-            "Apparently Osteria had a summer evidenced the almost empty dining room at 6:30 on a Friday night. However new blood in the kitchen seems to have revitalized the food from other customers recent visits. Waitstaff was warm but unobtrusive. By 8 pm or so when we left the bar was full and the dining room was much more lively than it had been. Perhaps Beverly residents prefer a later seating. After reading the mixed reviews of late I was a little tentative over our choice but luckily there was nothing to worry about in the food department. We started with the fried dough, burrata and prosciutto which were all lovely. Then although they don't offer half portions of pasta we each ordered the entree size and split them. We chose the tagliatelle bolognese and a four cheese filled pasta in a creamy sauce with bacon, asparagus and grana frita. Both were very good. We split a secondi which was the special Berkshire pork secreto, which was described as a pork skirt steak with garlic potato purée and romanesco broccoli (incorrectly described as a romanesco sauce). Some tables received bread before the meal but for some reason we did not. Management also seems capable for when the tenants in the apartment above began playing basketball she intervened and also comped the tables a dessert. We ordered the apple dumpling with gelato and it was also quite tasty. Portions are not huge which I particularly like because I prefer to order courses. If you are someone who orders just a meal you may leave hungry depending on you appetite. Dining room was mostly younger crowd while the bar was definitely the over 40 set. Would recommend that the naysayers return to see the improvement although I personally don't know the former glory to be able to compare. Easy access to downtown Salem without the crowds on this month of October.",
-            "I heard so many good things about this place so I was pretty juiced to try it. I’m from Cali and I heard Shake Shack is comparable to IN-N-OUT and I gotta say, Shake Shake wins hands down. Surprisingly, the line was short and we waited about 10 MIN. to order. I ordered a regular cheeseburger, fries and a black/white shake. So yummerz. I love the location too! It’s in the middle of the city and the view is breathtaking. Definitely one of my favorite places to eat in NYC. I’m from California and I must say, Shake Shack is better than IN-NOUT, all day, err’day. Would I pay $15+ for a burger here? No. But for the price point they are asking for, this is a definite bang for your buck (though for some,the opportunity cost of waiting in line might outweigh the cost savings)Thankfully, I came in before the lunch swarm descended and I ordered a shake shack (the special burger with the patty + fried cheese & portabella"]
+json_file_path = './samples.json'
+paragraphs = []
 
-#while(i < len(documents)):
-paragraph = documents[0] + documents[1] + documents[2]
-paragraph = process(paragraph)
-not_duplicate_paragraph = ' '.join(unique_list(paragraph.split())) 
-#print(not_duplicate_paragraph)
+for index, line in enumerate(open(json_file_path, 'r')):
+    if(index == 3):
+        break
+    paragraphs.append(json.loads(line)['text'])
 
-#Count occurence
-#Remove all the meaningless words
-keyWord_stream = not_duplicate_paragraph.split(" ")
-word_list = []
-no_meaning_word = [ 'a',
-                    'an',
-                    'the',
-                    'of',
-                    'with',
-                    'and',
-                    'in',
-                    'on',
-                    'at',
-                    'from',
-                    'then',
-                    'like',
-                    'get',
-                    'love',
-                    'hate',
-                    'smile',
-                    'sad',
-                    'happy',
-                    'angry',
-                    'be',
-                    'as',
-                    'he',
-                    'she',
-                    'it',
-                    'they',
-                    'i',
-                    'we',
-                    'you',
-                    'have',
-                    'has',
-                    'had',
-                    'was',
-                    'were']
-#Calculate TF list
-for keyWord in keyWord_stream:
-    if(keyWord not in no_meaning_word):
-        count_word = paragraph.count(keyWord)
-        word_dict = {keyWord:count_word}
-        word_list.append(word_dict) 
+# Cleaning data remove punctuation, special character, standarlized etc etc ....    
+paragraphs_after_cleaning = []
+paragraphs_after_cleaning = process(paragraphs)
+D = len(paragraphs_after_cleaning)
+# Word counter
+'''
+    * Finding the list of non duplicate word in each paragraph
+    * Getting all the non duplicate word and storing it inside one list
+    * Using the non duplicate keyword list to count the occurence number of each word
+'''
+not_duplicate_paragraphs = [] # array contains non duplicate words
+i = 0
 
-# D(w) Counting the number of document that contain keyword
+while i < D:
+    if(i >= D):
+        break
+    not_duplicate_paragraphs.append(' '.join(unique_list(paragraphs_after_cleaning[i].split())))
+    i+=1
+
+key_word_to_count = [] # Storage all the non duplicate key words in each paragraph
+i = 0
+while i < D:
+    if(i >= D):
+        break
+    key_word_to_count.append(not_duplicate_paragraphs[i].split(' '))
+    i+=1
+
+count_occurence_result = [] # Storing all the occurence time of each word in each paragraph
+i = 0
+while i < D:
+    if(i >= D):
+        break
+    j = 0
+    count_occurence_result_each_paragraph = []
+    d = len(key_word_to_count[i])
+    while j < d:
+        if(j >= d):
+            break
+        count_occurence_result_each_paragraph.append({key_word_to_count[i][j] : paragraphs_after_cleaning[i].count(key_word_to_count[i][j])})
+        j+=1
+    count_occurence_result.append(count_occurence_result_each_paragraph)
+    i+=1
+# Removing stop words
+stop_word_list_path = open('./stop_word.txt','r')
+stop_word_list = stop_word_list_path.read().split('\n')
+i = 0
+_d = len(stop_word_list)
+while i < _d:
+    if(i >= _d):
+        break
+    j = 0
+    len_occurence_list = len(count_occurence_result)
+    while j < len_occurence_list:
+        if(j >= len_occurence_list):
+            break
+        k = 0
+        len_each_occurence_list = len(count_occurence_result[j])
+        while(k < len_each_occurence_list):
+            if(k >= len_each_occurence_list):
+                break
+            key = list(count_occurence_result[j][k].keys())[0]
+            if(key == stop_word_list[i]):
+                count_occurence_result[j].pop(k)
+                break
+            k+=1
+        j+=1
+    i+=1
+# Removing common words
+stop_word_list_path = open('./common_word.txt','r')
+stop_word_list = stop_word_list_path.read().split('\n')
+i = 0
+_d = len(stop_word_list)
+while i < _d:
+    if(i >= _d):
+        break
+    j = 0
+    len_occurence_list = len(count_occurence_result)
+    while j < len_occurence_list:
+        if(j >= len_occurence_list):
+            break
+        k = 0
+        len_each_occurence_list = len(count_occurence_result[j])
+        while(k < len_each_occurence_list):
+            if(k >= len_each_occurence_list):
+                break
+            key = list(count_occurence_result[j][k].keys())[0]
+            if(key == stop_word_list[i]):
+                count_occurence_result[j].pop(k)
+                break
+            k+=1
+        j+=1
+    i+=1
+# Calculate TF_IDF
 DF = []
 IDF = []
 TF_IDF = []
-D = len(documents)
-paragraph_contain_word = []
-index = 0
-for wordDict in word_list:
-    for keyWord, value in wordDict.items():
-        count = 0
-        for paragraph in documents:
-            paragraph = process(paragraph)
-            if(paragraph.find(keyWord) > -1):
-                count += 1
-        if(count != 0):
-            df = count / D
-            idf = math.log(1/df)
-            DF.append(df)
-            IDF.append(idf)
-            TF_IDF.append({keyWord : idf * value})
-print(DF)
-print(IDF)
-print(TF_IDF)
+i = 0
+while i < D:
+    if(i >= D):
+        break
+    j = 0
+    d = len(count_occurence_result[i])
+    df = []
+    idf = []
+    tf_idf = []
+    while j < d:
+        if(j >= d):
+            break
+        k = 0
+        occurence_time_in_paragraph = 1
+        while k < D:
+            if(k != i):
+                if(k >= D):
+                    break
+                h = 0
+                _d2 = len(count_occurence_result[k])
+                while h < _d2:
+                    if(h >= _d2):
+                        break
+                    key1 = list(count_occurence_result[i][j].keys())[0]
+                    key2 = list(count_occurence_result[k][h].keys())[0]
+                    if(key1 == key2):
+                        occurence_time_in_paragraph += 1
+                        break
+                    h+=1
+            k+=1 
+        df.append(occurence_time_in_paragraph/D)
+        idf.append(math.log(1 / (occurence_time_in_paragraph/D)))    
+        tf_idf.append({'key_word' : key1, 'tf_idf' : list(count_occurence_result[i][j].values())[0] * math.log(1 / (occurence_time_in_paragraph/D)), 'occurence_time' : list(count_occurence_result[i][j].values())[0]})    
+        j+=1
+    DF.append(df)
+    IDF.append(idf)
+    TF_IDF.append(tf_idf)
+    i+=1
+
+# Sorted
+i = 0
+newlist = []
+while i < D:
+    if(i >= D):
+        break
+    newlist.append(sorted(TF_IDF[i], key=itemgetter('tf_idf'), reverse=True))
+    i+=1
+
+""" print(len(count_occurence_result[2]))
+print(len(DF[2]))
+print(len(IDF[2]))
+print(len(newlist[2])) """
+FINAL_RESULT = []
+i = 0
+while i < D:
+    if(i >= D):
+        break
+    j = 0
+    d = len(newlist[i])
+    final_result = []
+    while j < d:
+        if(j >= d):
+            break
+        key_word = newlist[i][j].get('key_word')
+        occurence_time = newlist[i][j].get('occurence_time')
+        final_result.append(str(key_word + ": " + str(occurence_time)))
+        j+=1
+    FINAL_RESULT.append(final_result)
+    i+=1
+print(FINAL_RESULT[0])
+
+
