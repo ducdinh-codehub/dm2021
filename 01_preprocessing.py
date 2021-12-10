@@ -25,8 +25,8 @@ json_file_path = './samples.json'
 paragraphs = []
 
 for index, line in enumerate(open(json_file_path, 'r')):
-    if(index == 3):
-        break
+    #if(index == 10):
+    #    break
     paragraphs.append(json.loads(line)['text'])
 
 # Cleaning data remove punctuation, special character, standarlized etc etc ....    
