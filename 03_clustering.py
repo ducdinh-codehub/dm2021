@@ -25,7 +25,7 @@ def process(paragraphs):
 x = []
 paragraphs = []
 for index, line in enumerate(open(json_file_path, 'r')):
-    if(index == 10000):
+    if(index == 10):
         break
     paragraphs.append(json.loads(line)['text'])
 
@@ -37,31 +37,40 @@ while i < len(paragraphs_after_cleaning):
     x.append(length_of_review)
     i+=1
 
-x_max = max(x)
-x_min = min(x)
 
-#Calculate mean
-i = 0
-total = 0
+# Creating a proximity matrix
+proximity_list = []
 for i in range(0, len(x)):
-    total += x[i]
-mean = total/len(x)
+    row = []
+    for j in range(0, len(x)):
+        if x[j] > x[i]:
+            row.append(x[j] - x[i])
+        else:
+            row.append(x[i] - x[j])
+    proximity_list.append(row)
+print(proximity_list)
 
-#Calculate standard deviation
-deviation = [(val-mean)**2 for val in x]
-variance = sum(deviation) / len(x)
-std = math.sqrt(variance)
+# Finding the smallest distance
+for i in range(0, len(proximity_list)):
+    min_index = 0
+    min = proximity_list[i][0]
+    j = 0
+    while j < len(proximity_list[i]):
+        if(j >= len(proximity_list[i])):
+            break
+        if(min != 0 and proximity_list[i][j] != 0):
+            if(min > proximity_list[i][j]):
+                min = proximity_list[i][j]
+                min_index = j
+        else:
+            j += 1
+            if(j >= len(proximity_list[i])):
+                break
+            min = proximity_list[i][j]
+            min_index = j
+        j += 1
 
-#Calculate ditribution value
-PDF = []
-for i in range(x_min, x_max):
-    pdf = (1/(std*math.sqrt(2*math.pi))) * math.exp(-1.2*(((i-mean)/std)**2))
-    PDF.append(pdf)
-
-normax = max(PDF)
-PDF = [normax * (700/ normax) for normax in PDF]
-plt.plot(range(x_min, x_max), PDF)
-n, bins, _ = plt.hist(x)
-plt.show()
+proximity_list.pop(0)
 
 
+print(len(proximity_list))
