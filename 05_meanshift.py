@@ -33,10 +33,13 @@ class Cluster:
     def addPoint(self, p):
         self.points.append(p)
 
+    def __repr__(self):
+        return f"[{[p.x for p in self.points]}]"
+
 wc = []
 paragraphs = []
 for index, line in enumerate(open(json_file_path, 'r')):
-    if(index == 10):
+    if(index == 100):
         break
     paragraphs.append(json.loads(line)['text'])
 
@@ -48,7 +51,7 @@ while i < len(paragraphs_after_cleaning):
     wc.append(length_of_review)
     i+=1
 
-MODE = np.zeros((50,50))
+MODE = np.zeros((1000,1000))
 BW = 4
 def flatKernel(input):
     if input <= BW:
@@ -63,8 +66,9 @@ def shiftMode(mode, wc):
          denominator += flatKernel(wc[j] - mode)
     result = numerator / denominator
     return result
-K = 3
-clusters = [Cluster() for i in range(0, K)]
+
+clusters_mass = set()
+clusters = []
 for i in range(0, len(wc)):
     k = 0
     MODE[i][k] = wc[i]
@@ -78,6 +82,37 @@ for i in range(0, len(wc)):
             break
     MODE[i][0] = MODE[i][k]
 
-print(MODE[i][0])
+    #clusters_mass.add(MODE[i][0])
+    #list_key = list(clusters.keys())
+
+    clusters.append({MODE[i][0]: wc[i]})
+    
+    #if(len(list_key) == 0 or MODE[i][0] not in list_key):
+    #    clusters = {MODE[i][0]: []}
+    #if(len(list_key) != 0 and MODE[i][0] in list_key):
+    #    clusters[MODE[i][0]].append(wc[i])
+
+key_list = set()
+for i in range(0, len(clusters)):
+    key_list.add(list(clusters[i].keys())[0])
+
+clusters_dict = {key: [] for key in key_list}
+CLUSTERS = [Cluster() for i in range(0, len(key_list))]
+
+for i in range(0,len(clusters)):
+    if list(clusters[i].keys())[0] in list(clusters_dict.keys()):
+        clusters_dict[list(clusters[i].keys())[0]].append(list(clusters[i].values())[0])
+
+number_of_cluster = 0
+for values in clusters_dict.values():
+    for val in values:
+        CLUSTERS[number_of_cluster].addPoint(Point(val))
+    number_of_cluster += 1
+
+print(CLUSTERS)
+
+
+
+
 
 
