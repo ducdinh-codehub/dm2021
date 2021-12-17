@@ -85,7 +85,7 @@ while i < len(paragraphs_after_cleaning):
 
 points = [Point(wcPoint) for wcPoint in wc]
 
-K = 3
+K = 0.1
 centroids = [random.choice(points) for i in range(0, K)]
 print(f"Initial centroids: {centroids}")
 while True:

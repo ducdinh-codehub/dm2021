@@ -52,7 +52,7 @@ while i < len(paragraphs_after_cleaning):
     i+=1
 
 MODE = np.zeros((1000,1000))
-BW = 4
+BW = 0
 def flatKernel(input):
     if input <= BW:
         return 1
@@ -67,49 +67,50 @@ def shiftMode(mode, wc):
     result = numerator / denominator
     return result
 
-clusters_mass = set()
-clusters = []
-for i in range(0, len(wc)):
-    k = 0
-    MODE[i][k] = wc[i]
-    while True:
-        print("i: ", i)
-        print("k: ", k)
-        MODE[i][k+1] = shiftMode(MODE[i][k], wc)
-        k += 1
-        print("abs(MODE[i][k] - MODE[i][k-1]): ", abs(MODE[i][k] - MODE[i][k-1]))
-        if abs(MODE[i][k] - MODE[i][k-1]) < BW:
-            break
-    MODE[i][0] = MODE[i][k]
+CLUSTERS = []
+while len(CLUSTERS) != 3:
+    if len(CLUSTERS) == 3:
+        break
+    else:
+        BW = BW + 1
+    clusters_mass = set()
+    clusters = []
+    for i in range(0, len(wc)):
+        k = 0
+        MODE[i][k] = wc[i]
+        while True:
+            print("i: ", i)
+            print("k: ", k)
+            MODE[i][k+1] = shiftMode(MODE[i][k], wc)
+            k += 1
+            print("abs(MODE[i][k] - MODE[i][k-1]): ", abs(MODE[i][k] - MODE[i][k-1]))
+            if abs(MODE[i][k] - MODE[i][k-1]) < BW:
+                break
+        MODE[i][0] = MODE[i][k]
 
-    #clusters_mass.add(MODE[i][0])
-    #list_key = list(clusters.keys())
+        clusters.append({MODE[i][0]: wc[i]})
 
-    clusters.append({MODE[i][0]: wc[i]})
-    
-    #if(len(list_key) == 0 or MODE[i][0] not in list_key):
-    #    clusters = {MODE[i][0]: []}
-    #if(len(list_key) != 0 and MODE[i][0] in list_key):
-    #    clusters[MODE[i][0]].append(wc[i])
+    key_list = set()
+    for i in range(0, len(clusters)):
+        key_list.add(list(clusters[i].keys())[0])
 
-key_list = set()
-for i in range(0, len(clusters)):
-    key_list.add(list(clusters[i].keys())[0])
+    clusters_dict = {key: [] for key in key_list}
+    CLUSTERS = [Cluster() for i in range(0, len(key_list))]
 
-clusters_dict = {key: [] for key in key_list}
-CLUSTERS = [Cluster() for i in range(0, len(key_list))]
+    for i in range(0,len(clusters)):
+        if list(clusters[i].keys())[0] in list(clusters_dict.keys()):
+            clusters_dict[list(clusters[i].keys())[0]].append(list(clusters[i].values())[0])
 
-for i in range(0,len(clusters)):
-    if list(clusters[i].keys())[0] in list(clusters_dict.keys()):
-        clusters_dict[list(clusters[i].keys())[0]].append(list(clusters[i].values())[0])
-
-number_of_cluster = 0
-for values in clusters_dict.values():
-    for val in values:
-        CLUSTERS[number_of_cluster].addPoint(Point(val))
-    number_of_cluster += 1
+    number_of_cluster = 0
+    for values in clusters_dict.values():
+        for val in values:
+            CLUSTERS[number_of_cluster].addPoint(Point(val))
+        number_of_cluster += 1
 
 print(CLUSTERS)
+print("--------------------------------")
+print("With bandwidth: ", BW)
+print("Number of cluster: ", len(CLUSTERS))
 
 
 
